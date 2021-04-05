@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31019.35
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FightmetricRdsCaScraper", "FightmetricRdsCaScraper\FightmetricRdsCaScraper.csproj", "{90F6141D-D882-4D9B-A7D1-E1CFF31509FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FightmetricRdsCaScraper.ConsoleExample", "FightmetricRdsCaScraper.ConsoleExample\FightmetricRdsCaScraper.ConsoleExample.csproj", "{B175BC00-3B9A-4456-B5E3-8EA0683928AF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{90F6141D-D882-4D9B-A7D1-E1CFF31509FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90F6141D-D882-4D9B-A7D1-E1CFF31509FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90F6141D-D882-4D9B-A7D1-E1CFF31509FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90F6141D-D882-4D9B-A7D1-E1CFF31509FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B175BC00-3B9A-4456-B5E3-8EA0683928AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B175BC00-3B9A-4456-B5E3-8EA0683928AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B175BC00-3B9A-4456-B5E3-8EA0683928AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B175BC00-3B9A-4456-B5E3-8EA0683928AF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FE7BEB44-0081-4578-9185-A3C237E82264}
+	EndGlobalSection
+EndGlobal
