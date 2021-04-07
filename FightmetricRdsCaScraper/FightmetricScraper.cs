@@ -175,7 +175,105 @@ namespace FightmetricRdsCaScraper
         }
         public Fighter ParseFighter(HtmlNode node)
         {
+            var attributes = node
+                .CssSelect("div.b-container__fighter_attributes li.b-box__item")
+                .Select(x => new
+                {
+                    label = x.CssSelect("i.b-box__label")
+                        .FirstOrDefault()
+                        ?.InnerText
+                        .Trim(),
+                    value = x.CssSelect("i.b-box__value")
+                        .FirstOrDefault()
+                })
+                .Where(x => x.label != null)
+                .ToDictionary(
+                    x => x.label,
+                    x => x.value);
+
+            var pieGraphs = node.CssSelect("#pie-graphs")
+                .FirstOrDefault();
+            var offensiveBreakdownGraph = node
+                .CssSelect("#offensive-breakdown-graph")
+                .FirstOrDefault();
             var result = new Fighter();
+            result.Weight = attributes["Weight"]
+                ?.InnerText
+                .Trim();
+            result.Height = attributes["Height"]
+                ?.InnerText
+                .Trim();
+            result.Reach = attributes["Reach"]
+                ?.InnerText
+                .Trim();
+            result.Age = attributes["Age"]
+                ?.InnerText
+                .Trim();
+            result.Stance = attributes["Stance"]
+                ?.InnerText
+                .Trim();
+            result.Born = attributes["Born"]
+                ?.InnerText
+                .Trim();
+            result.FightsOutOf = attributes["Fights Out Of"]
+                ?.InnerText
+                .Trim();
+            result.StrikesLandedPerMinute = node
+                .CssSelect("#slpm")
+                .FirstOrDefault()
+                ?.Attributes["data_value"]
+                .Value;
+            result.StrikesAbsorbedPerMinute = node
+                .CssSelect("#sapm")
+                .FirstOrDefault()
+                ?.Attributes["data_value"]
+                .Value;
+            result.StrikesUFCAvg = node
+                .CssSelect("#st-ufc-avg")
+                .FirstOrDefault()
+                ?.Attributes["data_value"]
+                .Value;
+            result.TakedownsLandedPer15 = node
+                .CssSelect("#td-per-15")
+                .FirstOrDefault()
+                ?.Attributes["data_value"]
+                .Value;
+            result.TakedownsLandedUFCAvg = node
+                .CssSelect("#td-ufc-avg")
+                .FirstOrDefault()
+                ?.Attributes["data_value"]
+                .Value;
+            result.SubmissionAttemptsPer15 = node
+                .CssSelect("#sb-per-15")
+                .FirstOrDefault()
+                ?.Attributes["data_value"]
+                .Value;
+            result.SubmissionAttemptsUFCAvg = node
+                .CssSelect("#sb-ufc-avg")
+                .FirstOrDefault()
+                ?.Attributes["data_value"]
+                .Value;
+            result.StrikingPercentage = offensiveBreakdownGraph
+                ?.Attributes["data_striking_percentage"]
+                .Value;
+            result.SubmissionsPercentage = offensiveBreakdownGraph
+                ?.Attributes["data_submission_percentage"]
+                .Value;
+            result.TakedownsPercentage = offensiveBreakdownGraph
+                ?.Attributes["data_takedown_percentage"]
+                .Value;
+            result.StrikingAccuracy = pieGraphs
+                ?.Attributes["data_striking_accuracy"]
+                .Value;
+            result.StrikingDefence = pieGraphs
+                ?.Attributes["data_striking_defence"]
+                .Value;
+            result.TakedownAccuracy = pieGraphs
+                ?.Attributes["data_takedown_accuracy"]
+                .Value;
+            result.TakedownDefence = pieGraphs
+                ?.Attributes["data_takedown_defence"]
+                .Value;
             return result;
         }
     }

@@ -8,6 +8,8 @@ namespace FightmetricRdsCaScraper.ConsoleExample
         private static void Main(string[] args)
         {
             var scraper = new FightmetricScraper();
+            var fighter = scraper.ScrapeFighter("https://fightmetric.rds.ca/fighter/2300");
+            Console.WriteLine(JsonConvert.SerializeObject(fighter, Formatting.Indented));
             var result = scraper
                 .ScrapeEvents(
                     Consts.CompletedUrl);
