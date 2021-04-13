@@ -7,7 +7,9 @@ namespace FightmetricRdsCaScraper.ConsoleExample
     {
         private static void Main(string[] args)
         {
-            var scraper = new FightmetricScraper();
+            IFightmetricScraper scraper = new FightmetricScraper();
+            var fight = scraper.ScrapeFight("https://fightmetric.rds.ca/fight/8947");
+            Console.WriteLine(JsonConvert.SerializeObject(fight, Formatting.Indented));
             var fighter = scraper.ScrapeFighter("https://fightmetric.rds.ca/fighter/2300");
             Console.WriteLine(JsonConvert.SerializeObject(fighter, Formatting.Indented));
             var result = scraper

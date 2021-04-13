@@ -1,4 +1,6 @@
-﻿namespace FightmetricRdsCaScraper
+﻿using System.Collections.Generic;
+
+namespace FightmetricRdsCaScraper
 {
     public class Fighter
     {
@@ -23,5 +25,6 @@
         public string StrikingDefence { get; set; }
         public string TakedownAccuracy { get; set; }
         public string TakedownDefence { get; set; }
+        public List<FighterFight> Fights { get; set; }
     }
 }

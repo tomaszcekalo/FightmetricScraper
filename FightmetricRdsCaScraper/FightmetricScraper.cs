@@ -71,22 +71,24 @@ namespace FightmetricRdsCaScraper
 
         public FightmetricEvent ParseFightmetricEvent(HtmlNode node)
         {
-            var result = new FightmetricEvent();
-            result.Title = node.CssSelect(".b-container__event_details .b-title")
-                .FirstOrDefault()
-                ?.InnerText
-                .Trim();
-            result.Date = node.CssSelect(".b-title__text")
-                .LastOrDefault()
-                ?.InnerText
-                .Trim();
-            result.Location = node.CssSelect("p.b-title__text")
-                .Select(x => x.InnerText.Trim())
-                .Take(2)
-                .ToArray();
-            result.Fights = node.CssSelect("tbody.b-table__body tr.b-table__row")
-                .Select(ParseEventFight)
-                .ToList();
+            var result = new FightmetricEvent
+            {
+                Title = node.CssSelect(".b-container__event_details .b-title")
+                    .FirstOrDefault()
+                    ?.InnerText
+                    .Trim(),
+                Date = node.CssSelect(".b-title__text")
+                    .LastOrDefault()
+                    ?.InnerText
+                    .Trim(),
+                Location = node.CssSelect("p.b-title__text")
+                    .Select(x => x.InnerText.Trim())
+                    .Take(2)
+                    .ToArray(),
+                Fights = node.CssSelect("tbody.b-table__body tr.b-table__row")
+                    .Select(ParseEventFight)
+                    .ToList()
+            };
             return result;
         }
 
@@ -164,7 +166,87 @@ namespace FightmetricRdsCaScraper
 
         public Fight ParseFight(HtmlNode node)
         {
-            var result = new Fight();
+            var redDonut = node.CssSelect("#b-container__red_fighter_donut")
+                .FirstOrDefault();
+            var blueDonut = node.CssSelect("#b-container__blue_fighter_donut")
+                .FirstOrDefault();
+            var result = new Fight
+            {
+                EventName = node.CssSelect(".b-container__fighter_header_dark")
+                    .FirstOrDefault()
+                    ?.InnerText
+                    .Trim(),
+                EventHref = node.CssSelect(".b-container__fighter_header_dark a")
+                    .FirstOrDefault()
+                    ?.Attributes["href"]
+                    .Value,
+                Performers = node.CssSelect(".b-container__breakdown_fighter_name")
+                    .Select(ParsePerformer)
+                    .ToList(),
+                Outcome = node.CssSelect(".b-container__result_outcome_description")
+                    .FirstOrDefault()
+                    ?.InnerText
+                    .Trim(),
+                Stats = node.CssSelect(".b-container__result_fighter_info")
+                    .CssSelect("div")
+                    .Select(x => x.CssSelect("div")
+                        .Select(y => y.InnerText).ToArray()),
+                StrikesRedBodyPercentage = redDonut
+                    ?.Attributes["data_body"]
+                    .Value,
+                StrikesRedHeadPercentage = redDonut
+                    ?.Attributes["data_head"]
+                    .Value,
+                StrikesRedLegPercentage = redDonut
+                    ?.Attributes["data_leg"]
+                    .Value,
+                StrikesBlueBodyPercentage = blueDonut
+                    ?.Attributes["data_body"]
+                    .Value,
+                StrikesBlueHeadPercentage = blueDonut
+                    ?.Attributes["data_head"]
+                    .Value,
+                StrikesBlueLegPercentage = blueDonut
+                    ?.Attributes["data_leg"]
+                    .Value,
+                LandedByRound = node
+                    .CssSelect("div.b-container__results_bar_graphs div.b-container__bar_couple")
+                    .Select(x => new
+                    {
+                        Round = x.CssSelect(".b-container__bar_couple_label")
+                            .FirstOrDefault()
+                            ?.InnerText
+                            .Trim(),
+                        Numbers = x.CssSelect("div.b-container__bar_couple_bar")
+                            .Select(y => y.Attributes["data_value"].Value)
+                            .ToArray()
+                    })
+                    .ToDictionary(x => x.Round, x => x.Numbers)
+            };
+            return result;
+        }
+
+        public Performer ParsePerformer(HtmlNode node)
+        {
+            var link = node.CssSelect("a")
+                .FirstOrDefault();
+            Performer result = new Performer
+            {
+                Href = link
+                    ?.Attributes["href"]
+                    .Value,
+                Name = link?
+                    .InnerText
+                    .Trim(),
+                Nick = node.CssSelect("h4")
+                    .FirstOrDefault()
+                    ?.InnerText
+                    .Trim(),
+                Score = node.CssSelect(".b-container_tight_record span")
+                    .FirstOrDefault()
+                    ?.InnerText
+                    .Trim()
+            };
             return result;
         }
 
@@ -196,84 +278,132 @@ namespace FightmetricRdsCaScraper
             var offensiveBreakdownGraph = node
                 .CssSelect("#offensive-breakdown-graph")
                 .FirstOrDefault();
-            var result = new Fighter();
-            result.Weight = attributes["Weight"]
-                ?.InnerText
-                .Trim();
-            result.Height = attributes["Height"]
-                ?.InnerText
-                .Trim();
-            result.Reach = attributes["Reach"]
-                ?.InnerText
-                .Trim();
-            result.Age = attributes["Age"]
-                ?.InnerText
-                .Trim();
-            result.Stance = attributes["Stance"]
-                ?.InnerText
-                .Trim();
-            result.Born = attributes["Born"]
-                ?.InnerText
-                .Trim();
-            result.FightsOutOf = attributes["Fights Out Of"]
-                ?.InnerText
-                .Trim();
-            result.StrikesLandedPerMinute = node
-                .CssSelect("#slpm")
-                .FirstOrDefault()
-                ?.Attributes["data_value"]
-                .Value;
-            result.StrikesAbsorbedPerMinute = node
-                .CssSelect("#sapm")
-                .FirstOrDefault()
-                ?.Attributes["data_value"]
-                .Value;
-            result.StrikesUFCAvg = node
-                .CssSelect("#st-ufc-avg")
-                .FirstOrDefault()
-                ?.Attributes["data_value"]
-                .Value;
-            result.TakedownsLandedPer15 = node
-                .CssSelect("#td-per-15")
-                .FirstOrDefault()
-                ?.Attributes["data_value"]
-                .Value;
-            result.TakedownsLandedUFCAvg = node
-                .CssSelect("#td-ufc-avg")
-                .FirstOrDefault()
-                ?.Attributes["data_value"]
-                .Value;
-            result.SubmissionAttemptsPer15 = node
-                .CssSelect("#sb-per-15")
-                .FirstOrDefault()
-                ?.Attributes["data_value"]
-                .Value;
-            result.SubmissionAttemptsUFCAvg = node
-                .CssSelect("#sb-ufc-avg")
-                .FirstOrDefault()
-                ?.Attributes["data_value"]
-                .Value;
-            result.StrikingPercentage = offensiveBreakdownGraph
-                ?.Attributes["data_striking_percentage"]
-                .Value;
-            result.SubmissionsPercentage = offensiveBreakdownGraph
-                ?.Attributes["data_submission_percentage"]
-                .Value;
-            result.TakedownsPercentage = offensiveBreakdownGraph
-                ?.Attributes["data_takedown_percentage"]
-                .Value;
-            result.StrikingAccuracy = pieGraphs
-                ?.Attributes["data_striking_accuracy"]
-                .Value;
-            result.StrikingDefence = pieGraphs
-                ?.Attributes["data_striking_defence"]
-                .Value;
-            result.TakedownAccuracy = pieGraphs
-                ?.Attributes["data_takedown_accuracy"]
-                .Value;
-            result.TakedownDefence = pieGraphs
-                ?.Attributes["data_takedown_defence"]
-                .Value;
+            var result = new Fighter
+            {
+                Fights = node
+                    .CssSelect(".b-container__fighter_fights tbody tr")
+                    .Select(ParseFighterFights)
+                    .ToList(),
+                Weight = attributes["Weight"]
+                    ?.InnerText
+                    .Trim(),
+                Height = attributes["Height"]
+                    ?.InnerText
+                    .Trim(),
+                Reach = attributes["Reach"]
+                    ?.InnerText
+                    .Trim(),
+                Age = attributes["Age"]
+                    ?.InnerText
+                    .Trim(),
+                Stance = attributes["Stance"]
+                    ?.InnerText
+                    .Trim(),
+                Born = attributes["Born"]
+                    ?.InnerText
+                    .Trim(),
+                FightsOutOf = attributes["Fights Out Of"]
+                    ?.InnerText
+                    .Trim(),
+                StrikesLandedPerMinute = node
+                    .CssSelect("#slpm")
+                    .FirstOrDefault()
+                    ?.Attributes["data_value"]
+                    .Value,
+                StrikesAbsorbedPerMinute = node
+                    .CssSelect("#sapm")
+                    .FirstOrDefault()
+                    ?.Attributes["data_value"]
+                    .Value,
+                StrikesUFCAvg = node
+                    .CssSelect("#st-ufc-avg")
+                    .FirstOrDefault()
+                    ?.Attributes["data_value"]
+                    .Value,
+                TakedownsLandedPer15 = node
+                    .CssSelect("#td-per-15")
+                    .FirstOrDefault()
+                    ?.Attributes["data_value"]
+                    .Value,
+                TakedownsLandedUFCAvg = node
+                    .CssSelect("#td-ufc-avg")
+                    .FirstOrDefault()
+                    ?.Attributes["data_value"]
+                    .Value,
+                SubmissionAttemptsPer15 = node
+                    .CssSelect("#sb-per-15")
+                    .FirstOrDefault()
+                    ?.Attributes["data_value"]
+                    .Value,
+                SubmissionAttemptsUFCAvg = node
+                    .CssSelect("#sb-ufc-avg")
+                    .FirstOrDefault()
+                    ?.Attributes["data_value"]
+                    .Value,
+                StrikingPercentage = offensiveBreakdownGraph
+                    ?.Attributes["data_striking_percentage"]
+                    .Value,
+                SubmissionsPercentage = offensiveBreakdownGraph
+                    ?.Attributes["data_submission_percentage"]
+                    .Value,
+                TakedownsPercentage = offensiveBreakdownGraph
+                    ?.Attributes["data_takedown_percentage"]
+                    .Value,
+                StrikingAccuracy = pieGraphs
+                    ?.Attributes["data_striking_accuracy"]
+                    .Value,
+                StrikingDefence = pieGraphs
+                    ?.Attributes["data_striking_defence"]
+                    .Value,
+                TakedownAccuracy = pieGraphs
+                    ?.Attributes["data_takedown_accuracy"]
+                    .Value,
+                TakedownDefence = pieGraphs
+                    ?.Attributes["data_takedown_defence"]
+                    .Value
+            };
+
+            return result;
+        }
+
+        private FighterFight ParseFighterFights(HtmlNode node)
+        {
+            var cells = node.CssSelect("td")
+                .ToList();
+            var result = new FighterFight
+            {
+                WL = node.CssSelect(".b-container__fight_outcome_highlight")
+                    .FirstOrDefault()
+                    ?.InnerText,
+                Weight = cells[1].InnerText.Trim(),
+                Belt = cells[1].CssSelect("img").Any(),
+                Fighters = cells[2].CssSelect("a")
+                    .ToDictionary(x => x.InnerText.Trim(),
+                        x => x.Attributes["href"].Value),
+                KD = cells[3].InnerText.Trim(),
+                STR = cells[4].InnerText.Trim(),
+                TD = cells[5].InnerText.Trim(),
+                SUB = cells[6].InnerText.Trim(),
+                EventName = cells[7].CssSelect("a")
+                    .FirstOrDefault()
+                    ?.InnerText
+                    .Trim(),
+                EventHref = cells[7].CssSelect("a")
+                    .FirstOrDefault()
+                    ?.Attributes["href"]
+                    .Value,
+                Method = cells[8]
+                    .InnerText.Trim(),
+                Round = cells[9]
+                    .InnerText.Trim(),
+                Time = cells[10]
+                    .InnerText.Trim(),
+                StatsHref = cells[11]
+                    .CssSelect("a")
+                    .FirstOrDefault()
+                    ?.Attributes["href"]
+                    .Value
+            };
             return result;
         }
     }
